@@ -3,12 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
+<title>Token Radar — pre-token protocols ranked by implied value</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<a class="skip" href="#board">Skip to the board</a>
-<div id="app" aria-busy="true"></div>
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <h1>Token Radar</h1>
+      <p class="sub">Pre-token protocols, ranked by implied value. Built from the sealed
+      2026-11-14 DefiLlama snapshot: 758 protocols at or above $5M TVL.</p>
+    </div>
+    <div class="hero-note">Implied value is this radar&rsquo;s own model claim &mdash; not a price,
+    and not a prediction of whether or when a token is issued.</div>
+  </div>
+</header>
+
+<main>
+  <section class="stats" id="stats"></section>
+
+  <section class="controls">
+    <input id="q" type="search" placeholder="Search a protocol&hellip;" autocomplete="off">
+    <select id="cat" aria-label="Category filter"></select>
+    <select id="chain" aria-label="Chain filter"></select>
+    <div class="tabs" role="tablist">
+      <button id="tab-pre" class="tab active" role="tab">Pre-token</button>
+      <button id="tab-live" class="tab" role="tab">Live token</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2 id="board-title">Ranked board</h2>
+      <span id="count" class="count"></span>
+    </div>
+    <table id="board">
+      <thead>
+        <tr>
+          <th data-sort="rank">#</th>
+          <th data-sort="name">Protocol</th>
+          <th data-sort="tvl_usd">TVL</th>
+          <th data-sort="change_7d">7d</th>
+          <th data-sort="age_days">Age</th>
+          <th data-sort="implied_value_usd">Implied value</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="empty" class="empty" hidden>No protocol matches these filters.</p>
+  </section>
+
+  <section class="panel calib">
+    <h2>How the model is calibrated</h2>
+    <p id="calib-line"></p>
+    <table id="mults">
+      <thead><tr><th>Category</th><th>Live comps</th><th>Multiple</th></tr></thead>
+      <tbody id="mult-rows"></tbody>
+    </table>
+    <p id="global-note" class="fine"></p>
+  </section>
+
+  <section class="panel method">
+    <h2>How the ranking works</h2>
+    <p><strong>Implied value = TVL &times; category multiple &times; growth &times; maturity &times; breadth.</strong>
+    The category multiple is the median market-cap-to-TVL ratio of live-token protocols in the same
+    category, taken from this very snapshot (a live token means a recorded, non-zero market cap).
+    A category with fewer than three live comps borrows its family's median; a category with no family
+    uses the global median of all live comps. Growth is the 7-day TVL change, clamped to &minus;60%…+120%.
+    Maturity rises with the protocol's age up to three years. Breadth adds 3% per extra chain, up to four.</p>
+    <h3>What is left out, and why</h3>
+    <p>The board holds the 40 watchlist protocols plus the 186 rankable pre-token protocols below the
+    $50M floor. The 63 above-floor rankable protocols that are not on the watchlist are left out on
+    purpose: they are bridges, liquid staking and wrapped products &mdash; infrastructure, not launch
+    candidates. A protocol counts as pre-token when it records no token at all (no CoinGecko id and no
+    ticker); a null market cap alone is not enough.</p>
+    <h3>Limits</h3>
+    <p class="fine">The implied value is a model claim built from public TVL and market-cap data. It is
+    not a price, not a valuation, and it does not predict whether or when a token is issued. Farm plans
+    describe how a reader could qualify for a future distribution; they are not financial advice, and
+    no step asks for money to be sent to anyone. <span id="recompute"></span></p>
+  </section>
+</main>
+
+<aside id="drawer" class="drawer" aria-hidden="true">
+  <button id="drawer-close" class="drawer-close" aria-label="Close">&times;</button>
+  <div id="drawer-body"></div>
+</aside>
+<div id="scrim" class="scrim" hidden></div>
+
 <script src="../data.js"></script>
 <script src="app.js"></script>
 </body>
